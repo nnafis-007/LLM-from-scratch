@@ -1,5 +1,26 @@
 import re
 
+# Build vocab
+with open("the-verdict.txt", "r", encoding="utf-8") as f:
+    raw_text = f.read()
+print("Total number of character in Corpus :", len(raw_text))
+# print(raw_text[:99])
+
+preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
+preprocessed = [item.strip() for item in preprocessed if item.strip()]
+
+all_words = sorted(set(preprocessed)) # keep only unique words
+vocab_size = len(all_words)
+print("Vocab size: ", vocab_size)
+
+vocab = {token:integer for integer,token in enumerate(all_words)}
+print("Vocab Sample :")
+for i, item in enumerate(vocab.items()):
+    print(item)
+    if i > 10:
+        break
+
+print("="*20)
 class SimpleTokenizerV1:
     def __init__(self, vocab):
         # store the vocab, token to id mapping
@@ -11,8 +32,8 @@ class SimpleTokenizerV1:
         }
     
     def encode(self, text):
-        # Tokenize
-        preprocessed = re.split(r'([,.?_!"()\']|--|\s)', text)
+        # Tokenize -> Split by punctuation, -- or whitespace (\s)
+        preprocessed = re.split(r'([,.?_!"()\']|--|\s)', text) 
         
         # For now we'll ignore whitespaces
         preprocessed = [
@@ -24,6 +45,11 @@ class SimpleTokenizerV1:
         return ids    
 
     def decode(self, ids):
+        # get strings from ids
         text = " ".join([self.int_to_str[i] for i in ids])
 
+        # punctuation also joined by \s, so search for pattern where punc trailed by whitespaces
+        # then replace then pattern by only the punctuation (r'\1')
+        text = re.sub(r'\s+([,.?!"()\'])', r'\1', text) 
+        return text
         
