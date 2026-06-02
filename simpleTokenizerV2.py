@@ -10,13 +10,13 @@ preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 preprocessed = [item.strip() for item in preprocessed if item.strip()]
 
 all_tokens = sorted(set(preprocessed)) # keep only unique words
-# all_tokens.extend(["<|endoftext|>", "<|unk|>"])
+all_tokens.extend(["<|endoftext|>", "<|unk|>"])
 vocab_size = len(all_tokens)
 print("Vocab size: ", vocab_size)
 
-vocab = {token:integer for integer,token in enumerate(all_tokens)}
+vocabV2 = {token:integer for integer,token in enumerate(all_tokens)}
 print("Vocab Sample :")
-for i, item in enumerate(vocab.items()):
+for i, item in enumerate(vocabV2.items()):
     print(item)
     if i > 10:
         break
@@ -24,7 +24,7 @@ for i, item in enumerate(vocab.items()):
 
 
 print("="*20)
-class SimpleTokenizerV1:
+class SimpleTokenizerV2:
     def __init__(self, vocab):
         # store the vocab, token to id mapping
         self.str_to_int = vocab 
@@ -42,6 +42,10 @@ class SimpleTokenizerV1:
         preprocessed = [
             item.strip() for item in preprocessed if item.strip() 
             ]
+        # Replace unknown words with <|unk|>
+        preprocessed = [item if item in self.str_to_int 
+            else "<|unk|>" for item in preprocessed]
+
         
         # Get IDs for tokens
         ids = [self.str_to_int[s] for s in preprocessed]
